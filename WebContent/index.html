@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>加法运算</title>
+</head>
+<body>
+<script type="text/javascript">
+
+		var websocket;
+		//添加值
+		function add () {
+			var num=document.getElementById("num");
+			var now=document.getElementById("now");
+			now.value=now.value+"+"+num.value;
+			num.value=0;
+		}
+		//发送
+		function send () {
+			//格式化
+			var list=(document.getElementById("now").value).split("+");
+			var str=list[0];
+			for (var i = 1; i < list.length; i++) {
+				str+=","+list[i];
+			}
+			var msg="add:"+str;
+			//发送
+			websocket.send(msg);
+		}
+		//连接
+		function conn () {
+			websocket=new WebSocket("ws://localhost:8080/addWebSocket/action");
+			//设置回调函数
+			websocket.onopen=function  (evt) {
+			};
+			websocket.onmessage=function (evt) {
+				var msg=evt.data.toString();
+				var resutl=(msg.split(':'))[1];
+				document.getElementById("resutl").value=resutl;
+			}
+			websocket.onerror=function () {
+				alert("异常错误");
+			}
+			websocket.onclose=function () {
+				alert("连接关闭");
+			}
+		}
+		//加载启动
+		window.addEventListener("load",conn,false);
+</script>
+			数字 ：<input type="text" id="num" />
+			<input type="button" value="+" onclick="add()"/><br/>
+			当前：<input type="text" id="now" name="now" value="0"/><br />
+			<input type="button" value="计算" onclick="send();"/><br/>
+			<input type="text" id="resutl" disabled="false">
+</body>
+</html>
